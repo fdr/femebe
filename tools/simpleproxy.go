@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"net/http"
+	_ "net/http/pprof"
 	"femebe"
 	"fmt"
 	"io"
@@ -156,6 +158,8 @@ func main() {
 		fmt.Printf("Usage: simpleproxy LISTENADDR SERVERADDR\n")
 		os.Exit(1)
 	}
+
+	go http.ListenAndServe("localhost:6060", nil)
 
 	ln, err := autoListen(os.Args[1])
 	if err != nil {
