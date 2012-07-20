@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/signal"
 	"strings"
+	"syscall"
 )
 
 // Automatically chooses between unix sockets and tcp sockets for
@@ -200,19 +201,18 @@ func parseRoutingEntry(tupleRaw string) (*routingEntry, error) {
 }
 
 // Signal handling: this is pretty ghetto now, but at least we can
-// exit cleanly on an interrupt. N.B.: this currently does not
-// correctly capture SIGTERM on Linux (and possibly elsewhere)--it
-// just kills the process directly without involving the signal
-// handler.
+// exit cleanly on an interrupt.
 func installSignalHandlers() {
 	sigch := make(chan os.Signal)
-	signal.Notify(sigch, os.Interrupt, os.Kill)
+	signal.Notify(sigch, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		for sig := range sigch {
 			log.Printf("Got signal %v", sig)
-			if sig == os.Kill {
+			switch sig {
+			case syscall.SIGTERM:
 				os.Exit(2)
-			} else if sig == os.Interrupt {
+
+			case syscall.SIGINT:
 				os.Exit(0)
 			}
 		}
