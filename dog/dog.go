@@ -257,6 +257,6 @@ func main() {
 		go handleConnection(conn, rt)
 	}
 
-	log.Println("simpleproxy quits successfully")
+	log.Println("dog quits successfully")
 	return
 }
